@@ -1,1 +1,7 @@
-include "";
+include "stdio.h";
+
+extern printf;
+
+func @int main() {
+    printf("%d\n", 1 * 3 * 400 + 20);
+};

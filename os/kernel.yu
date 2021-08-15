@@ -1,7 +1,12 @@
-include "os/yukern.h";
+include "yukern.h";
 
 extern terminal_initialize;
-extern terminal_writestring;
+extern terminal_write;
+extern strlen;
+
+func @void terminal_writestring(@string data) {
+    terminal_write(data, strlen(data));
+};
 
 func @void kernel_main() {
     terminal_initialize();

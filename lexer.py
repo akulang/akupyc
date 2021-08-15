@@ -23,6 +23,7 @@ class TokenType(enum.Enum):
     EXTERN = 111
     STRUCT = 112
     TYPEDEF = 113
+    FOR = 114
 
     EQ = 201
     PLUS = 202
@@ -41,6 +42,7 @@ class TokenType(enum.Enum):
     RBRACE = 215
     COMMA = 216
     HASH = 217
+    DOT = 218
 
 class Token:
     def __init__(self, text, kind):
@@ -101,7 +103,33 @@ class Lexer:
         elif self.current == '/':
             token = Token(self.current, TokenType.SLASH)
         elif self.current == '=':
-            token = Token(self.current, TokenType.EQ)
+            if self.peek() == '=':
+                lastChar = self.current
+                self.nextChar()
+                token = Token(lastChar + self.current, TokenType.EQEQ)
+            else:
+                token = Token(self.current, TokenType.EQ)
+        elif self.current == '>':
+            if self.peek() == '=':
+                lastChar = self.current
+                self.nextChar()
+                token = Token(lastChar + self.current, TokenType.GTEQ)
+            else:
+                token = Token(self.current, TokenType.GT)
+        elif self.current == '<':
+            if self.peek() == '=':
+                lastChar = self.current
+                self.nextChar()
+                token = Token(lastChar + self.current, TokenType.LTEQ)
+            else:
+                token = Token(self.current, TokenType.LT)
+        elif self.current == '!':
+            if self.peek() == '=':
+                lastChar = self.current
+                self.nextChar()
+                token = Token(lastChar + self.current, TokenType.BANGEQ)
+            else:
+                self.abort("expected !=, got !`%s`" % self.peek())
         elif self.current == '\"':
             self.nextChar()
             startPos = self.pos
@@ -124,7 +152,7 @@ class Lexer:
 
         elif self.current == '@':
             startPos = self.pos + 1
-            while self.peek().isalnum():
+            while self.peek().isalnum() or self.peek() == '_':
                 self.nextChar()
 
             tokText = self.source[startPos:self.pos + 1]
@@ -157,6 +185,8 @@ class Lexer:
             token = Token(self.current, TokenType.SEMI)
         elif self.current == ',':
             token = Token(self.current, TokenType.COMMA)
+        elif self.current == '.':
+            token = Token(self.current, TokenType.DOT)
         elif self.current == '\n':
             token = Token(self.current, TokenType.NEWLINE)
         elif self.current == '\0':

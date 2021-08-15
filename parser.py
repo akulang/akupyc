@@ -1,5 +1,7 @@
 import sys
 from lexer import *
+import random
+import string
 
 class Parser:
     def __init__(self, lexer, emitter, usestdlib):
@@ -7,10 +9,15 @@ class Parser:
         self.emitter = emitter
         self.usestdlib = usestdlib
 
-        self.symbols = set()
+        self.globals = dict()
+        self.locals = dict()
         self.types = set()
         self.types.add('int')
+        self.types.add('int8')
+        self.types.add('int16')
         self.types.add('int32')
+        self.types.add('int64')
+        self.types.add('char')
         self.types.add('double')
         self.types.add('uint8')
         self.types.add('uint16')
@@ -19,6 +26,7 @@ class Parser:
         self.types.add('void')
         self.types.add('string')
         self.structs = set()
+        self.structsymbols = dict()
         self.labelsDeclared = set()
         self.labelsGotoed = set()
         self.cheaders = set()
@@ -71,12 +79,13 @@ class Parser:
 
             if self.checkToken(TokenType.IDENT):
                 name = self.curToken.text
-                if not name in scope:
-                    scope.add(name)
+                if not name in self.globals.keys():
+                    self.globals[name] = fctype
                 else:
                     self.abort("function `%s` already declared")
                 self.nextToken()
                 self.match(TokenType.LPAREN)
+                self.locals[name] = dict()
                 args = []
                 if self.checkToken(TokenType.TYPE):
                     ftype = self.curToken.text
@@ -88,7 +97,7 @@ class Parser:
                             args.append("%s %s" % (ftype, self.curToken.text))
                         else:
                             args.append("char* %s" % (self.curToken.text))
-                        scope.add(self.curToken.text)
+                        self.locals[name][self.curToken.text] = ftype
                         self.nextToken()
                         if not self.checkToken(TokenType.RPAREN):
                             if self.checkToken(TokenType.COMMA):
@@ -112,19 +121,160 @@ class Parser:
                 self.match(TokenType.RPAREN)
                 self.match(TokenType.LBRACE)
 
+                if fctype == 'string':
+                    fctype = 'char*'
                 self.emitter.functionLine("{} {}({})".format(fctype, name, ', '.join(args)) + "{")
 
                 while self.checkToken(TokenType.NEWLINE):
                     self.nextToken()
 
                 while not self.checkToken(TokenType.RBRACE):
-                    self.statement(self.emitter.functionLine, self.emitter.function, self.symbols)
+                    self.statement(self.emitter.functionLine, self.emitter.function, self.locals[name])
 
                 self.match(TokenType.RBRACE)
                 self.emitter.functionLine("}")
             else:
                 # anon function
                 pass
+
+        elif self.checkToken(TokenType.WHILE):
+            self.nextToken()
+            porfunc("while(")
+            self.match(TokenType.LPAREN)
+            self.comparison(porfunc, scope)
+
+            self.match(TokenType.RPAREN)
+            self.match(TokenType.LBRACE)
+
+            linefunc("){")
+
+            while self.checkToken(TokenType.NEWLINE):
+                self.nextToken()
+
+            while not self.checkToken(TokenType.RBRACE):
+                self.statement(linefunc, porfunc, scope)
+
+            self.match(TokenType.RBRACE)
+            linefunc("}")
+
+        elif self.checkToken(TokenType.FOR):
+            '''
+            self.nextToken()
+            self.match(TokenType.LPAREN)
+
+            rid = 'for' + ''.join([random.choice(string.ascii_letters) for n in range(4)])
+            self.locals[rid] = dict()
+
+            porfunc("for(")
+            if self.checkToken(TokenType.TYPE):
+                ftype = self.curToken.text
+                if not ftype in self.types:
+                    self.abort("type does not exist `%s`" % ftype)
+                self.nextToken()
+                name = self.curToken.text
+                self.match(TokenType.IDENT)
+                self.match(TokenType.EQ)
+                porfunc("%s %s = " % (ftype, name))
+                self.expression(porfunc, scope)
+                self.match(TokenType.SEMI)
+                self.locals[rid][name] = ftype
+                porfunc(";")
+                
+            else:
+                self.match(TokenType.SEMI)
+                porfunc(";")
+
+            if self.checkToken(TokenType.SEMI):
+                self.match(TokenType.SEMI)
+                porfunc(";")
+            else:
+                self.comparison(porfunc, self.locals[rid])
+                self.match(TokenType.SEMI)
+                porfunc(";")
+            
+            print(self.curToken.kind.name)
+            self.primary(porfunc, self.locals[rid])
+            self.match(TokenType.RPAREN)
+            linefunc("){")
+            self.match(TokenType.LBRACE)
+
+            while self.checkToken(TokenType.NEWLINE):
+                self.nextToken()
+            
+            while not self.checkToken(TokenType.RBRACE):
+                self.statement(linefunc, porfunc, self.locals[rid])
+
+            self.match(TokenType.RBRACE)
+            linefunc("}")'''
+
+        elif self.checkToken(TokenType.IF):
+            self.nextToken()
+            self.match(TokenType.LPAREN)
+            porfunc("if(")
+            self.comparison(porfunc, scope)
+
+            self.match(TokenType.RPAREN)
+            self.match(TokenType.LBRACE)
+            linefunc("){")
+
+            while self.checkToken(TokenType.NEWLINE):
+                self.nextToken()
+
+            while not self.checkToken(TokenType.RBRACE):
+                self.statement(linefunc, porfunc, scope)
+
+            self.match(TokenType.RBRACE)
+            porfunc("}")
+            if self.checkToken(TokenType.ELIF):
+                while self.checkToken(TokenType.ELIF):
+                    self.nextToken()
+                    self.match(TokenType.LPAREN)
+                    porfunc(" else if(")
+                    self.comparison(porfunc, scope)
+                    self.match(TokenType.RPAREN)
+                    linefunc("){")
+                    self.match(TokenType.LBRACE)
+
+                    while self.checkToken(TokenType.NEWLINE):
+                        self.nextToken()
+
+                    while not self.checkToken(TokenType.RBRACE):
+                        self.statement(linefunc, porfunc, scope)
+
+                    if not self.checkToken(TokenType.RBRACE):
+                        self.abort("expected RBRACE, got " + self.curToken.kind.name)
+                    porfunc("}")
+                    self.nextToken()
+                
+                if self.checkToken(TokenType.ELSE):
+                    self.nextToken()
+                    linefunc(" else {")
+                    self.match(TokenType.LBRACE)
+
+                    while self.checkToken(TokenType.NEWLINE):
+                        self.nextToken()
+
+                    while not self.checkToken(TokenType.RBRACE):
+                        self.statement(linefunc, porfunc, scope)
+
+                    self.match(TokenType.RBRACE)
+                    porfunc("}\n")
+
+            elif self.checkToken(TokenType.ELSE):
+                self.nextToken()
+                linefunc(" else {")
+                self.match(TokenType.LBRACE)
+
+                while self.checkToken(TokenType.NEWLINE):
+                    self.nextToken()
+
+                while not self.checkToken(TokenType.RBRACE):
+                    self.statement(linefunc, porfunc, scope)
+
+                self.match(TokenType.RBRACE)
+                porfunc("}\n")
+            else:
+                porfunc("\n")
 
 
         elif self.checkToken(TokenType.INCLUDE):
@@ -135,7 +285,7 @@ class Parser:
 
         elif self.checkToken(TokenType.EXTERN):
             self.nextToken()
-            scope.add(self.curToken.text)
+            self.globals[self.curToken.text] = '@void'
             self.match(TokenType.IDENT)
 
         elif self.checkToken(TokenType.HASH):
@@ -174,6 +324,7 @@ class Parser:
             self.types.add(name)
             self.match(TokenType.IDENT)
             if ortype in self.structs:
+                self.structsymbols[name] = self.structsymbols[ortype]
                 self.emitter.macro("typedef struct %s %s;\n" % (ortype, name))
             else:
                 self.emitter.macro("typedef %s %s;\n" % (ortype, name))
@@ -185,6 +336,7 @@ class Parser:
             self.match(TokenType.LBRACE)
             self.emitter.macro("struct %s {\n" % name)
             self.structs.add(name)
+            self.structsymbols[name] = set()
             while self.checkToken(TokenType.NEWLINE):
                 self.nextToken()
                 
@@ -195,7 +347,11 @@ class Parser:
                 self.match(TokenType.IDENT)
                 self.match(TokenType.SEMI)
                 self.match(TokenType.NEWLINE)
-                self.emitter.macro("\t%s %s;\n" % (stype, sname))
+                if stype != "string":
+                    self.emitter.macro("\t%s %s;\n" % (stype, sname))
+                else:
+                    self.emitter.macro("\tchar* %s;\n" % (sname))
+                self.structsymbols[name].add(sname)
 
             self.match(TokenType.RBRACE)
             self.emitter.macro("};\n")
@@ -204,8 +360,9 @@ class Parser:
             name = self.curToken.text
             self.nextToken()
             if self.checkToken(TokenType.LPAREN): # func call
-                if not name in scope:
-                    self.abort("function `%s` does not exist" % name)
+                if not name in scope.keys():
+                    if not name in self.globals.keys():
+                        self.abort("function `%s` does not exist" % name)
                 self.nextToken()
                 porfunc("{}(".format(name))
                 while not self.checkToken(TokenType.RPAREN):
@@ -255,18 +412,35 @@ class Parser:
 
             name = self.curToken.text
             self.match(TokenType.IDENT)
-            if name in self.symbols:
-                self.abort("symbol already declared `%s`" % name)
+            if name in scope.keys():
+                self.abort("symbol `%s` already declared in scope" % name)
+            elif name in self.globals.keys():
+                self.abort("symbol `%s` already declared" % name)
             else:
-                scope.add(name)
+                scope[name] = ftype
 
             self.match(TokenType.EQ)
-            if ftype != 'string':
-                porfunc("%s %s = " % (ftype, name))
+            if not self.checkToken(TokenType.LBRACE):
+                if ftype != 'string':
+                    porfunc("%s %s = " % (ftype, name))
+                else:
+                    porfunc("char* %s = " % (name))
+                self.expression(porfunc, scope)
+                linefunc(";")
             else:
-                porfunc("char* %s = " % (name))
-            self.expression(porfunc, scope)
-            linefunc(";")
+                self.nextToken()
+                if not ftype in self.types:
+                    self.abort("attempting to initialize a type that doesn't exist `%s`" % ftype)
+                porfunc("%s %s = { " % (ftype, name))
+                while not self.checkToken(TokenType.RBRACE):
+                    self.expression(porfunc, scope)
+                    if self.checkToken(TokenType.COMMA):
+                        porfunc(", ")
+                        self.nextToken()
+                
+                porfunc(" };\n")
+                self.structsymbols[name] = self.structsymbols[ftype]
+                self.match(TokenType.RBRACE)
 
         else:
             self.abort("invalid statement at " + self.curToken.text + "(" + self.curToken.kind.name + ")")
@@ -275,7 +449,7 @@ class Parser:
         self.nl()
 
     def isComparisonOperator(self):
-        return self.checkToken(TokenType.GT) or self.checkToken(TokenType.GTEQ) or self.checkToken(TokenType.LT) or self.checkToken(TokenType.LTEQ) or self.checkToken(TokenType.EQEQ) or self.checkToken(TokenType.NOTEQ)
+        return self.checkToken(TokenType.GT) or self.checkToken(TokenType.GTEQ) or self.checkToken(TokenType.LT) or self.checkToken(TokenType.LTEQ) or self.checkToken(TokenType.EQEQ) or self.checkToken(TokenType.BANGEQ)
 
     def term(self, porfunc, scope):
 
@@ -293,6 +467,19 @@ class Parser:
             self.nextToken()
         self.primary(porfunc, scope)
 
+    def comparison(self, porfunc, scope):
+        self.expression(porfunc, scope)
+
+        if self.isComparisonOperator():
+            porfunc(self.curToken.text)
+            self.nextToken()
+            self.expression(porfunc, scope)
+
+        while self.isComparisonOperator():
+            porfunc(self.curToken.text)
+            self.nextToken()
+            self.expression(porfunc, scope)
+
 
 
     def primary(self, porfunc, scope):
@@ -304,8 +491,9 @@ class Parser:
             ename = self.curToken.text
             if self.checkPeek(TokenType.LPAREN): # func call
                 self.nextToken()
-                if not ename in scope:
-                    self.abort("function `%s` does not exist" % ename)
+                if not ename in scope.keys():
+                    if not ename in self.globals.keys():
+                        self.abort("function `%s` does not exist" % ename)
                 self.nextToken()
                 porfunc("{}(".format(ename))
                 while not self.checkToken(TokenType.RPAREN):
@@ -316,9 +504,27 @@ class Parser:
 
                 self.match(TokenType.RPAREN)
                 porfunc(")")
+            elif self.checkPeek(TokenType.DOT): # struct property
+                self.nextToken()
+                self.nextToken()
+                prop = self.curToken.text
+                self.match(TokenType.IDENT)
+                if not ename in scope.keys():
+                    if not ename in self.globals.keys():
+                        self.abort("referencing a symbol that isn't assigned yet or doesn't exist `%s`" % ename)
+                
+                if not prop in self.structsymbols[ename]:
+                    self.abort("struct `%s` does not have property `%s`" % (ename, prop))
+                porfunc("%s.%s" % (ename, prop))
+            elif self.checkToken(TokenType.PLUS):
+                print(self.curToken.kind.name)
+                self.nextToken()
+                self.match(TokenType.PLUS)
+                porfunc("%s++" % ename)
+                
             else:
                 if ename not in scope:
-                    self.abort("referencing a symbol that isn't assigned yet or doesn't exist: " + ename)
+                    self.abort("referencing a symbol that isn't assigned yet or doesn't exist `%s`" % ename)
             
                 porfunc(ename)
                 self.nextToken()
@@ -351,7 +557,7 @@ class Parser:
             self.nextToken()
 
         while not self.checkToken(TokenType.EOF):
-            self.statement(self.emitter.emitLine, self.emitter.emit, self.symbols)
+            self.statement(self.emitter.emitLine, self.emitter.emit, self.globals)
 
         for label in self.labelsGotoed:
             if label not in self.labelsDeclared:
