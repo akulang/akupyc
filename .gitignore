@@ -5,11 +5,5 @@ yuc.dist/
 # object files
 *.o
 
-# pycache *vomits*
-__pycache__/**
-
 # vscode files
 .vscode/
-
-# os lol
-os/*
