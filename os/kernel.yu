@@ -1,0 +1,10 @@
+include "os/yukern.h";
+
+extern terminal_initialize;
+extern terminal_writestring;
+
+func @void kernel_main() {
+    terminal_initialize();
+
+    terminal_writestring("Hello Kernel!\n");
+};
