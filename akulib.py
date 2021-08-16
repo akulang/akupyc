@@ -6,6 +6,7 @@ akulib = '''
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef FILE *file;
 
@@ -28,6 +29,18 @@ char* readfile(char* path, char* mode) {
 
     buffer[fsize] = 0;
     return buffer;
+}
+
+char* join(char delim, char** strs) {
+    char* res = calloc(128, sizeof(char));
+    char* c;
+    char sep[2] = { delim, 0 };
+    int i = 0;
+    for (c = strs[i]; c; c = strs[++i]) {
+        strcat(res, c);
+        strcat(res, sep);
+    }
+    return res;
 }
 '''
 

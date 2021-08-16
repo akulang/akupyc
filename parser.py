@@ -547,6 +547,9 @@ class Parser:
         elif self.checkToken(TokenType.STRING):
             porfunc("\"" + self.curToken.text + "\"")
             self.nextToken()
+        elif self.checkToken(TokenType.CHAR):
+            porfunc("\'" + self.curToken.text + "\'")
+            self.nextToken()
         else:
             self.abort("unexpected token at primary parsing: " + self.curToken.text)
 

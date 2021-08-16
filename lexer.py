@@ -9,6 +9,7 @@ class TokenType(enum.Enum):
     STRING = 3
     SEMI = 4
     TYPE = 5
+    CHAR = 6
 
     LABEL = 101
     GOTO = 102
@@ -143,7 +144,21 @@ class Lexer:
 
             tokText = self.source[startPos:self.pos]
             token = Token(tokText, TokenType.STRING)
+        elif self.current == '\'':
+            self.nextChar()
+            startPos = self.pos
 
+            while self.current != '\'':
+                if not self.current.isascii():
+                    self.abort("character exceeds ASCII range 0-255")
+                if self.current == '\r' or self.current == '\n' or self.current == '\t':
+                    self.abort("illegal escape in character")
+                self.nextChar()
+
+            tokText = self.source[startPos:self.pos]
+            if self.pos - startPos != 1:
+                self.abort("character of illegal length `%s`" % self.pos - startPos)
+            token = Token(tokText, TokenType.CHAR)
         elif self.current.isdigit():
             startPos = self.pos
             while self.peek().isdigit():
