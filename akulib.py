@@ -7,6 +7,7 @@ akulib = '''
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 typedef FILE *file;
 
@@ -42,6 +43,18 @@ char* join(char delim, char** strs) {
     }
     return res;
 }
+
+int print(char* str) {
+    int written = 0;
+    written = printf("%s", str);
+    return written;
+}
+
+int println(char* str) {
+    int written = 0;
+    written = printf("%s\\n", str);
+    return written;
+}
 '''
 
 # Bare-metal runtime library
@@ -51,5 +64,50 @@ metallib = '''
 #include <stdint.h>
 #include <stdbool.h>
 
+int strlen(char* str) {
+    int len = 0;
+    while(str[len])
+        len++;
+    return len;
+}
 
+void* memmove(void* dstptr,  void* srcptr, uint64_t size) {
+    uint8_t* dst = (uint8_t*) dstptr;
+	uint8_t* src = (uint8_t*) srcptr;
+	if (dst < src) {
+		for (uint64_t i = 0; i < size; i++)
+			dst[i] = src[i];
+	} else {
+		for (uint64_t i = size; i != 0; i--)
+			dst[i-1] = src[i-1];
+	}
+	return dstptr;
+}
+
+int memcmp(void* aptr, void* bptr, uint64_t size) {
+	uint8_t* a = (uint8_t*) aptr;
+	uint8_t* b = (uint8_t*) bptr;
+	for (uint64_t i = 0; i < size; i++) {
+		if (a[i] < b[i])
+			return -1;
+		else if (b[i] < a[i])
+			return 1;
+	}
+	return 0;
+}
+
+void* memset(void* bufptr, int value, uint64_t size) {
+	uint8_t* buf = (uint8_t*) bufptr;
+	for (uint64_t i = 0; i < size; i++)
+		buf[i] = (uint8_t) value;
+	return bufptr;
+}
+
+void* memcpy(void* dstptr, void* restrict srcptr, uint64_t size) {
+	uint8_t* dst = (uint8_t*) dstptr;
+	uint64_t* src = (uint64_t*) srcptr;
+	for (uint64_t i = 0; i < size; i++)
+		dst[i] = src[i];
+	return dstptr;
+}
 '''

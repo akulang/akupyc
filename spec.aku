@@ -1,5 +1,9 @@
 // comments look like this
 
+/*
+mulitline here
+*/
+
 include "stdio.h"; // include C headers
 
 struct Magic {
@@ -10,29 +14,32 @@ struct Magic {
 typedef Magic magic_t;
 
 extern printf;
-//extern tester;
+extern join;
+extern print;
 
 func @char hi() {
-    //tester();
     return 50;
 };
 
-// types are indicated by a @ symbol
-// types include:
-// @int         - normal integer
-// @int8        - 8 bit integer
-// @int16       - 16 bit integer
-// @int32       - 32 bit integer
-// @int64       - 64 bit integer
-// @char        - character
-// @double      - double
-// @uint8       - unsigned 8 bit integer
-// @uint16      - unsigned 16 bit integer
-// @uint32      - unsigned 32 bit integer
-// @uint64      - unsigned 64 bit integer
-// @void        - void
-// @string      - char pointer (char*)
-func @int main() {
+/**
+ * types are indicated by a @ symbol
+ * types include:
+ * @int         - normal integer
+ * @int8        - 8 bit integer
+ * @int16       - 16 bit integer
+ * @int32       - 32 bit integer
+ * @int64       - 64 bit integer
+ * @char        - character
+ * @float       - float
+ * @uint8       - unsigned 8 bit integer
+ * @uint16      - unsigned 16 bit integer
+ * @uint32      - unsigned 32 bit integer
+ * @uint64      - unsigned 64 bit integer
+ * @void        - void
+ * @string      - char pointer (char*)
+ * @stringp     - string pointer (string* or char**)
+ */
+func @int main(@int argc, @stringp argv) {
     @magic_t test = { "BIG MAN", 25 };
 
     printf("test.name = %s\n", test.name);
@@ -52,6 +59,34 @@ func @int main() {
         printf("in a while loop! iteration: %d\n", count);
         count = count + 1;
     };
+
+    printf("merge xx and yy into xxyy:\n");
+    @int xx = 0x11 << 8;
+    printf("xx = 0x%02x\n", xx >> 8);
+    @int yy = 00;
+    printf("yy = 0x%02x\n", yy);
+    
+    @int xxyy = xx | yy;
+    printf("xxyy = 0x%04x\n", xxyy);
+
+    if(1 == 2 || 1 == 1) {
+        printf("logical or\n");
+    } else {
+        printf("hm yes won't reach me ;)\n");
+    };
+
+    if(1 == 1 && 1 == 2) {
+        printf("won't reach me ;)\n");
+    } else {
+        printf("logical and! (because && requires both sides to evaluate to true and 1 isn't equal to 2)\n");
+    };
+
+    printf("args: %s\n", join(' ', argv));
+
+    @float db = 1.0;
+    printf("floats! %f\n", db);
+
+    print("test!");
 
     return 0;
 };

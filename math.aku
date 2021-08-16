@@ -1,0 +1,20 @@
+include "stdio.h";
+
+extern printf;
+
+func @int main(@int argc, @stringp argv) {
+    // merge XX and YY into XXYY
+    @int xx = 0x11 << 8;
+    @int yy = 00;
+    
+    @int xxyy = xx | yy;
+
+    // get XX of XXYY
+    @int xx2 = xxyy & 0xFF00;
+    printf("0x%x\n", xx2 >> 8);
+
+    if(xx == 0x1100 && xx2 == 0x11) {
+        printf("xx is correct :)\n");
+    };
+    return 0;
+};

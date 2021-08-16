@@ -6,6 +6,9 @@
 			"include": "#comments"
 		},
 		{
+			"include": "#multiline"
+		},
+		{
 			"include": "#keywords"
 		},
 		{
@@ -34,7 +37,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.aku",
-				"match": "\\b(if|while|for|return|include|extern|struct|typedef|goto|label|func)\\b"
+				"match": "\\b(if|elif|else|import|while|for|return|include|extern|struct|typedef|goto|label|func)\\b"
 			}]
 		},
 		"function": {
@@ -73,6 +76,11 @@
 				"match": "//.*$"
 			}]
 		},
+		"multiline": {
+			"name": "comment.block.aku",
+			"begin": "/\\*",
+			"end": "\\*/"
+		},
 		"strings": {
 			"name": "string.quoted.double.aku",
 			"begin": "\"",
@@ -81,15 +89,21 @@
 				{
 					"name": "constant.character.escape.aku",
 					"match": "\\\\."
+				},
+				{
+					"name": "constant.language.aku",
+					"match": "%."
 				}
 			]
 		},
 		"character": {
 			"name": "string.quoted.single.aku",
+			"begin": "'",
+			"end": "'",
 			"patterns": [
 				{
 					"name": "constant.character.escape.aku",
-					"match": "'\\.'"
+					"match": "\\\\."
 				}
 			]
 		}
