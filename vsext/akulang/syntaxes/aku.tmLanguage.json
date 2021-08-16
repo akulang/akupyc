@@ -9,6 +9,9 @@
 			"include": "#keywords"
 		},
 		{
+			"include": "#function"
+		},
+		{
 			"include": "#identifier"
 		},
 		{
@@ -34,16 +37,22 @@
 				"match": "\\b(if|while|for|return|include|extern|struct|typedef|goto|label|func)\\b"
 			}]
 		},
+		"function": {
+			"patterns": [{
+				"name": "entity.name.function",
+				"match": "[a-zA-Z][a-zA-Z0-9_]*\\("
+			}]
+		},
 		"types": {
 			"patterns": [{
-				"name": "constant.character.escape.aku",
-				"match": "@\\b(int|int8|int16|int32|int64|double|char|string|stringp|file|uint8|uint16|uint32|uint64|void)\\b"
+				"name": "entity.name.type.aku",
+				"match": "@[a-zA-Z][a-zA-Z0-9_]*"
 			}]
 		},
 		"identifier": {
 			"patterns": [{
 				"name": "variable.aku",
-				"match": "[A-Za-z_]+"
+				"match": "[a-zA-Z][a-zA-Z0-9_]*"
 			}]
 		},
 		"hex": {
