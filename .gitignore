@@ -6,5 +6,5 @@ akuc.dist/
 *.o
 
 # vscode files
-.vscode/
+.vscode/**
 *.vsix
