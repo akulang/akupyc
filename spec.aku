@@ -10,8 +10,10 @@ struct Magic {
 typedef Magic magic_t;
 
 extern printf;
+//extern tester;
 
 func @char hi() {
+    //tester();
     return 50;
 };
 

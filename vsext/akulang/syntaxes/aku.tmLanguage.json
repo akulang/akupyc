@@ -1,0 +1,89 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Aku",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#identifier"
+		},
+		{
+			"include": "#hex"
+		},
+		{
+			"include": "#number"
+		},
+		{
+			"include": "#types"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#character"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.aku",
+				"match": "\\b(if|while|for|return|include|extern|struct|typedef|goto|label|func)\\b"
+			}]
+		},
+		"types": {
+			"patterns": [{
+				"name": "constant.character.escape.aku",
+				"match": "@\\b(int|int8|int16|int32|int64|double|char|string|stringp|file|uint8|uint16|uint32|uint64|void)\\b"
+			}]
+		},
+		"identifier": {
+			"patterns": [{
+				"name": "variable.aku",
+				"match": "[A-Za-z_]+"
+			}]
+		},
+		"hex": {
+			"patterns": [{
+				"name": "constant.numeric.hex.aku",
+				"match": "0x[A-Fa-f0-9]+"
+			}]
+		},
+		"number": {
+			"patterns": [{
+				"name": "constant.numeric",
+				"match": "[0-9]+"
+			}]
+		},
+		"comments": {
+			"patterns": [{
+				"name": "comment.line.aku",
+				"match": "//.*$"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.aku",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.aku",
+					"match": "\\\\."
+				}
+			]
+		},
+		"character": {
+			"name": "string.quoted.single.aku",
+			"patterns": [
+				{
+					"name": "constant.character.escape.aku",
+					"match": "'\\.'"
+				}
+			]
+		}
+	},
+	"scopeName": "source.aku"
+}

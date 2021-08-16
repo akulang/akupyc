@@ -1,0 +1,35 @@
+{
+    "name": "akulang",
+    "displayName": "akulang",
+    "description": "Syntax Highlighting support for Aku",
+    "version": "0.0.2",
+    "publisher": "RaidTheWeb",
+    "engines": {
+        "vscode": "^1.59.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "aku",
+                "aliases": [
+                    "Aku",
+                    "aku"
+                ],
+                "extensions": [
+                    ".aku"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "aku",
+                "scopeName": "source.aku",
+                "path": "./syntaxes/aku.tmLanguage.json"
+            }
+        ]
+    }
+}

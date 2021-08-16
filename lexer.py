@@ -43,6 +43,8 @@ class TokenType(enum.Enum):
     COMMA = 216
     HASH = 217
     DOT = 218
+    LSQUARE = 219
+    RSQUARE = 220
 
 class Token:
     def __init__(self, text, kind):
@@ -187,6 +189,10 @@ class Lexer:
             token = Token(self.current, TokenType.COMMA)
         elif self.current == '.':
             token = Token(self.current, TokenType.DOT)
+        elif self.current == '[':
+            token = Token(self.current, TokenType.LSQUARE)
+        elif self.current == ']':
+            token = Token(self.current, TokenType.RSQUARE)
         elif self.current == '\n':
             token = Token(self.current, TokenType.NEWLINE)
         elif self.current == '\0':
