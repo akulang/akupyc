@@ -1,6 +1,6 @@
 # nuika build files
-yuc.build/
-yuc.dist/
+akuc.build/
+akuc.dist/
 
 # object files
 *.o
