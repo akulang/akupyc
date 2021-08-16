@@ -58,7 +58,7 @@ class Parser:
         self.peekToken = self.lexer.getToken()
 
     def abort(self, message):
-        sys.exit("yuc: \033[31;1mparsing\033[0m: " + message + "")
+        sys.exit("akuc: \033[31;1mparsing\033[0m: " + message + "")
 
 
     def nl(self):

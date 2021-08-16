@@ -76,7 +76,7 @@ class Lexer:
         return self.source[self.pos + 1]
 
     def abort(self, reason):
-        sys.exit("yuc: lexer: " + reason)
+        sys.exit("akuc: lexer: " + reason)
     
     def skipWhitespace(self):
         while self.current == ' ' or self.current == '\t' or self.current == '\r':
