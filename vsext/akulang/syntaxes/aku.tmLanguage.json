@@ -40,7 +40,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.aku",
-				"match": "\\b(if|elif|else|import|while|for|return|include|extern|struct|typedef|goto|label|func)\\b"
+				"match": "\\b(if|elif|else|import|while|for|return|include|extern|struct|typedef|goto|label|func|switch|case|import|break|continue)\\b"
 			}]
 		},
 		"function": {

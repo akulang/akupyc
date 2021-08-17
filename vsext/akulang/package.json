@@ -2,7 +2,7 @@
     "name": "akulang",
     "displayName": "akulang",
     "description": "Syntax Highlighting support for Aku",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "publisher": "RaidTheWeb",
     "engines": {
         "vscode": "^1.59.0"

@@ -11,6 +11,7 @@ class TokenType(enum.Enum):
     TYPE = 5
     CHAR = 6
     FLOAT = 7
+    COLON = 8
 
     LABEL = 101
     GOTO = 102
@@ -26,6 +27,10 @@ class TokenType(enum.Enum):
     STRUCT = 112
     TYPEDEF = 113
     FOR = 114
+    BREAK = 115
+    CONTINUE = 116
+    SWITCH = 117
+    CASE = 118
 
     EQ = 201
     PLUS = 202
@@ -281,6 +286,8 @@ class Lexer:
             token = Token(self.current, TokenType.LSQUARE)
         elif self.current == ']':
             token = Token(self.current, TokenType.RSQUARE)
+        elif self.current == ':':
+            token = Token(self.current, TokenType.COLON)
         elif self.current == '\n':
             token = Token(self.current, TokenType.NEWLINE)
         elif self.current == '\0':

@@ -286,6 +286,38 @@ class Parser:
             else:
                 porfunc("\n")
 
+        elif self.checkToken(TokenType.SWITCH):
+            self.nextToken()
+            self.match(TokenType.LPAREN)
+            porfunc("switch(")
+            self.expression(porfunc, scope)
+            self.match(TokenType.RPAREN)
+            self.match(TokenType.LBRACE)
+            linefunc("){")
+            while self.checkToken(TokenType.NEWLINE):
+                self.nextToken()
+
+            while self.checkToken(TokenType.CASE):
+                self.nextToken()
+                rid = 'case' + ''.join([random.choice(string.ascii_letters) for n in range(5)])
+                porfunc("case ")
+                self.primary(porfunc, scope, False)
+                linefunc(": {")
+                self.match(TokenType.COLON)
+                self.match(TokenType.LBRACE)
+                self.locals[rid] = dict()
+                while self.checkToken(TokenType.NEWLINE):
+                    self.nextToken()
+
+                while not self.checkToken(TokenType.RBRACE):
+                    self.statement(linefunc, porfunc, self.locals[rid])
+                linefunc("}")
+                self.match(TokenType.RBRACE)
+                if self.checkToken(TokenType.NEWLINE):
+                    self.nextToken()
+
+            self.match(TokenType.RBRACE)
+            linefunc("}")
 
         elif self.checkToken(TokenType.INCLUDE):
             self.nextToken()
@@ -398,6 +430,14 @@ class Parser:
             self.expression(porfunc, scope)
             linefunc(";")
 
+        elif self.checkToken(TokenType.BREAK):
+            self.nextToken()
+            linefunc("break;")
+        
+        elif self.checkToken(TokenType.CONTINUE):
+            self.nextToken()
+            linefunc("continue;")
+
         elif self.checkToken(TokenType.LABEL):
             self.nextToken()
             if self.curToken.text in self.labelsDeclared:
@@ -506,7 +546,7 @@ class Parser:
             self.nextToken()
             self.shift(porfunc, scope)
 
-    def primary(self, porfunc, scope):
+    def primary(self, porfunc, scope, allowstr = True):
 
         if self.checkToken(TokenType.NUMBER):
             porfunc(self.curToken.text)
@@ -567,8 +607,11 @@ class Parser:
                 porfunc(ename)
                 self.nextToken()
         elif self.checkToken(TokenType.STRING):
-            porfunc("\"" + self.curToken.text + "\"")
-            self.nextToken()
+            if allowstr:
+                porfunc("\"" + self.curToken.text + "\"")
+                self.nextToken()
+            else:
+                self.abort("illegal string encountered")
         elif self.checkToken(TokenType.CHAR):
             porfunc("\'" + self.curToken.text + "\'")
             self.nextToken()
