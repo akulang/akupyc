@@ -1,26 +1,10 @@
 include "stdio.h";
 
 extern printf;
+extern input;
 
 func @int main() {
-    @int count = 0;
-
-    while(true) {
-        count = count + 1;
-        if(count > 4) {
-            break;
-        };
-        printf("ayy\n");
-    };
-
-    switch(1) {
-        case 0: {
-            printf("not gonna happen.\n");
-            break;
-        }
-        case 1: {
-            printf("hm yes yes.\n");
-            break;
-        }
-    };
+    @string str = input("> ", 20);
+    printf("%s", str);
+    return 0;
 };

@@ -55,6 +55,13 @@ int println(char* str) {
     written = printf("%s\\n", str);
     return written;
 }
+
+char* input(char* prompt, int size) {
+    char* res = malloc(size);
+    printf("%s", prompt);
+    fgets(res, size, stdin);
+    return res;
+}
 '''
 
 # Bare-metal runtime library
