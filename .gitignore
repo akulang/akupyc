@@ -8,3 +8,7 @@ akuc.dist/
 # vscode files
 .vscode/**
 *.vsix
+
+# python
+__pycache__/
+*.pyc
