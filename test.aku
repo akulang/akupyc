@@ -4,4 +4,8 @@ extern printf;
 
 func @int main() {
     printf("%d\n", 1 * 3 * 400 + 20);
+    printf("%d\n", true);
+    if(nil) {
+        printf("true!\n");
+    };
 };

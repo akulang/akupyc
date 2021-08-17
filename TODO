@@ -1,0 +1,7 @@
+[ ] inline asm
+[X] @voidp
+[ ] break
+[ ] continue
+[X] true (global)
+[X] false (global)
+[X] nill (global)

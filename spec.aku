@@ -36,6 +36,7 @@ func @char hi() {
  * @uint32      - unsigned 32 bit integer
  * @uint64      - unsigned 64 bit integer
  * @void        - void
+ * @voidp       - void pointer (void*)
  * @string      - char pointer (char*)
  * @stringp     - string pointer (string* or char**)
  */
@@ -86,7 +87,7 @@ func @int main(@int argc, @stringp argv) {
     @float db = 1.0;
     printf("floats! %f\n", db);
 
-    print("test!");
+    print("test!\n");
 
     return 0;
 };

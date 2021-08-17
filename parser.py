@@ -13,6 +13,9 @@ class Parser:
         self.libraries = libraries
 
         self.globals = dict()
+        self.globals['true'] = 'bool'
+        self.globals['false'] = 'bool'
+        self.globals['nil'] = 'voidp'
         self.locals = dict()
         self.types = set()
         self.types.add('int')
@@ -30,6 +33,8 @@ class Parser:
         self.types.add('string')
         self.types.add('file')
         self.types.add('stringp')
+        self.types.add('voidp')
+        self.types.add('bool')
         self.structs = set()
         self.structsymbols = dict()
         self.labelsDeclared = set()
@@ -604,7 +609,11 @@ typedef uint8_t uint8;      // 8 bit unsigned integer
 typedef uint16_t uint16;    // 16 bit unsigned integer
 typedef uint32_t uint32;    // 32 bit unsigned integer
 typedef uint64_t uint64;    // 64 bit unsigned integer
-typedef char **stringp;     // char**''')
+typedef char **stringp;     // char**
+typedef void *voidp;        // void*
+#define true 1              // boolean true
+#define false 0             // boolean false
+#define nil (voidp)0        // nil''')
         self.emitter.headerLine("// user headers")
 
         self.emitter.emit("\n\n")

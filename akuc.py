@@ -12,18 +12,24 @@ def main():
     if(len(sys.argv) == 1):
         sys.exit("akuc: \033[31;1mfatal\033[0m: no input file specified.")
     elif(len(sys.argv) == 2):
+        if not os.path.exists(sys.argv[1]):
+            sys.exit("akuc: \033[31;1mfatal\033[0m: input file does not exist.")
         with open(sys.argv[1], 'r') as inputFile:
             input = inputFile.read()
 
         lexer = Lexer(input)
-        emitter = Emitter("out.c")
+        outC = "out" + sys.argv[1].split('.')[0] + ".c"
+        emitter = Emitter(outC)
         parser = Parser(lexer, emitter, True, {})
 
         parser.program()
         emitter.writeFile()
-        os.system('gcc -g out.c -o {}'.format(sys.argv[1].split(".")[0]))
-        os.remove("out.c")
+        os.system('gcc -g {} -o {}'.format(outC, sys.argv[1].split(".")[0]))
+        os.remove(outC)
     elif(len(sys.argv) >= 3):
+        if not os.path.exists(sys.argv[1]):
+            sys.exit("akuc: \033[31;1mfatal\033[0m: input file does not exist.")
+
         with open(sys.argv[1], 'r') as inputFile:
             input = inputFile.read()
 
@@ -56,9 +62,6 @@ def main():
                 else:
                     sys.exit("akuc: \033[31;1mfatal\033[0m: could not find library `%s`." % libx)
 
-
-        if not os.path.exists(sys.argv[1]):
-            sys.exit("akuc: \033[31;1mfatal\033[0m: input file does not exist.")
 
         lexer = Lexer(input)
         outC = "out" + sys.argv[1].split('.')[0] + ".c"
